@@ -6,9 +6,18 @@ use Illuminate\Http\Request;
 use App\Models\Sucursal;
 use App\Models\Sala;
 use App\Models\Pelicula;
+use App\Models\Funcion;
+use Dompdf\Dompdf;
 
 class adminController extends Controller
 {
+    public function dashboard()
+    {
+        $salas = Sala::all();
+        $sucursales = Sucursal::all();
+        return view('dashboard', compact('salas', 'sucursales'));
+    }
+
     public function index(){
         $sucursales=Sucursal::all();
         return view('sucursales',compact('sucursales'));
@@ -38,12 +47,16 @@ class adminController extends Controller
 
     public function show($id){
         $sucursal=sucursal::find($id);
-        return view('sucursales-modifica',compact('sucursal'));
+        $salas=Sala::all();
+        
+        return view('sucursales-modifica',compact('sucursal','salas'));
     }
 
     public function showPelicula($id){
         $pelicula=Pelicula::find($id);
-        return view('peliculas-modifica',compact('pelicula'));
+        $salas=Sala::all();
+        $sucursales=Sucursal::all();
+        return view('peliculas-modifica',compact('pelicula','salas','sucursales'));
     }
     
     public function update(Request $request,$id){
@@ -68,7 +81,7 @@ class adminController extends Controller
 
     public function indexSalas(){
         $sucursales=Sucursal::all();
-        $salas=sala::all();
+        $salas=Sala::all();
         return view('salas',compact(['sucursales','salas']));
     }
 
@@ -77,6 +90,12 @@ class adminController extends Controller
         return view('peliculas',compact(['peliculas']));
     }
 
+    public function showSalas($id){
+        $sala = Sala::find($id);
+        $sucursales =Sucursal::all();
+        return view('salas-modifica',compact('sala','sucursales'));
+    }
+    
     public function saveSalas(Request $request){
         $sala=new Sala();
         $sala->nombre=$request->nombre;
@@ -95,4 +114,87 @@ class adminController extends Controller
         $pelicula->save();
         return redirect()->back();
     }
+
+    public function deleteSalas($id){
+        $sala=Sala::find($id);
+        $sala->delete();
+        return redirect()->back();
+    }
+   
+    public function updateSalas(Request $request,$id){
+        $sala=Sala::find($id);
+        $sala->nombre=$request->nombre;
+        $sala->capacidad=$request->capacidad;
+        $sala->sucursal_id=$request->sucursal_id;
+        $sala->save();
+        return redirect()->route('salas.index');
+    }
+    
+    public function indexFunciones(){
+        $salas=Sala::all();
+        $peliculas=Pelicula::all();
+        $funciones=Funcion::all();
+        return view('funciones',compact(['salas','peliculas','funciones']));
+    }
+
+    public function saveFunciones(Request $request)
+{
+    $funcion = new Funcion();
+    $funcion->sala_id = $request->sala_id;
+    $funcion->pelicula_id = $request->pelicula_id;
+    $funcion->fecha = $request->fecha;
+    $funcion->tipo = $request->tipo;
+    $funcion->costo = $request->costo;
+    $funcion->save();
+    return redirect()->back();
+}
+
+public function deleteFunciones($id){
+    $funcion = Funcion::find($id);
+    $funcion->delete();
+    return redirect()->back();
+
+}
+    public function showFunciones($id){
+        $funcion=Funcion::find($id);
+        $peliculas = Pelicula::all();
+        $salas = Sala::all();
+        return view('funciones-modifica',compact('funcion','peliculas','salas'));
+    }
+   
+   public function updateFunciones(Request $request,$id){
+    $funcion = Funcion::find($id);
+    $funcion->pelicula_id = $request->pelicula_id;
+    $funcion->sala_id = $request->sala_id;
+    $funcion->fecha = $request->fecha ?? $request->fecha_hora; 
+    $funcion->tipo = $request->tipo;
+    $funcion->costo = $request->costo;
+    $funcion->save();
+
+    return redirect()->route('funciones.index');
+    }
+
+    public function edit($id)
+    {
+        $funcion = Funcion::find($id);
+        $peliculas = Pelicula::all();
+        $salas = Sala::all();
+        return view('funciones-modifica', compact('funcion', 'peliculas', 'salas'));
+    }
+
+    public function generarReportePeliculasSalas(REQUEST $request)
+    {
+        $dompdf = new Dompdf();
+        $salas = sala::find($request->sala_id);
+        $funciones = funcion::where('sala_id', $request->sala_id)->get();
+        $peliculas = pelicula::all();
+        
+        $html = view('reportesPeliculasSalas', compact('salas', 'funciones', 'peliculas'))->render();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        return $dompdf->stream('reporte_peliculas_salas.pdf');
+        
+    }
+
 }

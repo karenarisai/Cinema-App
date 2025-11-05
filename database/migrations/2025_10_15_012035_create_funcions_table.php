@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('pelicula_id');
             $table->unsignedBigInteger('sala_id');
             $table->string('tipo');
+            $table->double('costo');
             $table->foreign('pelicula_id')->references('id')->on('peliculas');
             $table->foreign('sala_id')->references('id')->on('salas');
             $table->softDeletes();

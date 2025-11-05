@@ -15,4 +15,18 @@
             <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
         </div>
     </div>
+
+    <div>
+        <form method="POST" action="{{ route('generar.pdf') }}">
+            @csrf
+            <label for="file-upload" class="Custom-file-upload"><i class="fas fa-upload"></i> Salas</label>
+           <select name="sala-select" id="salas">
+                @foreach($salas as $sala)
+                    <option value="{{ $sala->id }}">{{ $sala->nombre }}</option>
+                @endforeach
+              
+           </select>
+            <button type="submit" variant="primary">Generar Reporte PDF</button>
+        </form>
+    </div>
 </x-layouts.app>

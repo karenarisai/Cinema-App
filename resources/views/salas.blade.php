@@ -5,61 +5,70 @@
         </flux:modal.trigger>
 
         <div class="mt-2">
-        <table class="w-full border border-black">
-            <thead>
-                <th>Id</th>
-                <th>Nombre</th>
-                <th>Capacidad</th>
-                <th>Sucursal</th>
-                <th>Acciones</th>
-            </thead>
-            <tbody class="text-center">
-                @foreach($salas as $sala)
-                <tr class="border border-b-black py-2">
-                    <td>{{$sala->id}}</td>
-                    <td>{{$sala->nombre}}</td>
-                    <td>{{$sala->capacidad}}</td>
-                    @foreach ($sucursales as $sucursal)
-                        @if ($sala->sucursal_id == $sucursal->id)
-                            <td>{{$sucursal->nombre}}</td>
-                        @endif
+            <table class="w-full border border-black">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Capacidad</th>
+                        <th>Sucursal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @foreach($salas as $sala)
+                        <tr class="border border-b-black py-2">
+                            <td>{{ $sala->id }}</td>
+                            <td>{{ $sala->nombre }}</td>
+                            <td>{{ $sala->capacidad }}</td>
+
+                            {{-- Mostrar el nombre de la sucursal --}}
+                            <td>
+                                @php
+                                    $sucursal = $sucursales->firstWhere('id', $sala->sucursal_id);
+                                @endphp
+                                {{ $sucursal ? $sucursal->nombre : 'Sin sucursal' }}
+                            </td>
+
+                            {{-- Acciones por sala --}}
+                            <td class="flex items-center justify-around">
+                                <form method="POST" action="{{ route('salas.delete', $sala->id) }}">
+                                    @csrf
+                                    <flux:button type="submit">Eliminar</flux:button>
+                                </form>
+                                <flux:brand href="{{ route('salas.show', $sala->id) }}" name="Modificar"></flux:brand>
+                            </td>
+                        </tr>
                     @endforeach
-                    <td class="flex items-center justify-around">
-                        <form method='POST' action={{ route('sucursales.delete',$sucursal->id) }}>
-                            @csrf
-                            <flux:button type="submit">Eliminar</flux:button>
-                        </form>
-                        <flux:brand href="{{route('sucursales.show',$sucursal->id)}}" name="Modificar">
-                         </flux:brand>   
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
-    </div>
+
+    {{-- Modal para agregar salas --}}
     <flux:modal name="edit-profile" class="md:w-96">
-            <div class="space-y-6">
-                <div>
-                    <flux:heading size="lg">Agregar salas</flux:heading>
-                    <flux:text class="mt-2">Agrega todos los detalles de las salas.</flux:text>
-                </div>
-
-                <form METHOD='POST' action="{{ route('salas.save') }}">
-                    @csrf
-                    <flux:input label="Nombre" placeholder="Nombre" wire:model='nombre' />
-                    <flux:input label="Capacidad" placeholder="capacidad" wire:model='capacidad' type="number" />
-                    <flux:select wire:model="sucursal_id" label="sucursal" placeholder="Selecciona sucursal">
-                        @foreach($sucursales as $sucursal)
-                        <flux:select.option value='{{ $sucursal->id }}'>{{ $sucursal->nombre }}</flux:select.option>
-                        @endforeach
-                    </flux:select>
-                    <div class="flex">
-                        <flux:spacer />
-
-                        <flux:button type="submit" variant="primary">Guardar</flux:button>
-                    </div>
-                </form>
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Agregar salas</flux:heading>
+                <flux:text class="mt-2">Agrega todos los detalles de las salas.</flux:text>
             </div>
+
+            <form method="POST" action="{{ route('salas.save') }}">
+                @csrf
+                <flux:input label="Nombre" placeholder="Nombre" wire:model='nombre' />
+                <flux:input label="Capacidad" placeholder="Capacidad" wire:model='capacidad' type="number" />
+
+                <flux:select wire:model="sucursal_id" label="Sucursal" placeholder="Selecciona sucursal">
+                    @foreach($sucursales as $sucursal)
+                        <flux:select.option value='{{ $sucursal->id }}'>{{ $sucursal->nombre }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+
+                <div class="flex">
+                    <flux:spacer />
+                    <flux:button type="submit" variant="primary">Guardar</flux:button>
+                </div>
+            </form>
+        </div>
     </flux:modal>
 </x-layouts.app>
