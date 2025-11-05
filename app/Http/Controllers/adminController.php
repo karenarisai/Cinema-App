@@ -185,15 +185,15 @@ public function deleteFunciones($id){
     public function generarReportePeliculasSalas(REQUEST $request)
     {
         $dompdf = new Dompdf();
-        $salas = sala::find($request->sala_id);
-        $funciones = funcion::where('sala_id', $request->sala_id)->get();
-        $peliculas = pelicula::all();
-        
+        $salas = Sala::find($request->salas);
+        $funciones = Funcion::where('sala_id', $request->salas)->get();
+        $peliculas = Pelicula::all();
+        //dd($request->salas);
         $html = view('reportesPeliculasSalas', compact('salas', 'funciones', 'peliculas'))->render();
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-        return $dompdf->stream('reporte_peliculas_salas.pdf');
+        return $dompdf->stream('reporte_peliculas_salas.pdf', ['Attachment' => true]);
         
     }
 

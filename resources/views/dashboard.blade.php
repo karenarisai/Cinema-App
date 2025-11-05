@@ -20,13 +20,13 @@
         <form method="POST" action="{{ route('generar.pdf') }}">
             @csrf
             <label for="file-upload" class="Custom-file-upload"><i class="fas fa-upload"></i> Salas</label>
-           <select name="sala-select" id="salas">
+           <select name="salas" id="salas">
                 @foreach($salas as $sala)
                     <option value="{{ $sala->id }}">{{ $sala->nombre }}</option>
                 @endforeach
               
            </select>
-            <button type="submit" variant="primary">Generar Reporte PDF</button>
+            <button type="submit" >Generar Reporte PDF</button>
         </form>
     </div>
 </x-layouts.app>
