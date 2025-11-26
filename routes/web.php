@@ -55,6 +55,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('funciones/show/{id}',[adminController::class,'showFunciones'])->name('funciones.show');
     Route::post('funciones/update/{id}',[adminController::class,'updateFunciones'])->name('funciones.update');
     Route::post('generarpdf',[adminController::class,'generarReportePeliculasSalas'])->name('generar.pdf');
+    Route::post('importar-peliculas',[adminController::class,'importarPeliculas'])->name('peliculas.importar');
+
 });
 
 require __DIR__.'/auth.php';

@@ -8,6 +8,11 @@ use App\Models\Sala;
 use App\Models\Pelicula;
 use App\Models\Funcion;
 use Dompdf\Dompdf;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\enviarCorreos;
+
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\PeliculasImport;
 
 class adminController extends Controller
 {
@@ -112,6 +117,7 @@ class adminController extends Controller
         $pelicula->genero=$request->genero;
         $pelicula->duracion=$request->duracion;
         $pelicula->save();
+        Mail::to('karenarisaig@gmail.com')->send(new enviarCorreos($pelicula));
         return redirect()->back();
     }
 
@@ -195,6 +201,22 @@ public function deleteFunciones($id){
         $dompdf->render();
         return $dompdf->stream('reporte_peliculas_salas.pdf', ['Attachment' => true]);
         
+    }
+
+    public function importarPeliculas(Request $request)
+    {
+        $request->validate([
+            'archivo' => 'required|file|mimes:xlsx,csv',
+        ]);
+       
+        try {
+            $archivo = $request->file('archivo');
+            Excel::import(new PeliculasImport, $archivo);
+            return redirect()->back()->with('success', 'Películas importadas exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Error al importar las películas: ' . $e->getMessage()]);
+        }
+       
     }
 
 }

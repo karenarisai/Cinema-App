@@ -5,6 +5,28 @@
             <flux:button>Agregar peliculas</flux:button>
         </flux:modal.trigger>
     </div>
+
+   
+
+    <form method='POST' action='{{ route("peliculas.importar") }}' enctype='multipart/form-data' class="space-y-4">
+					@csrf
+					<div>
+						<flux:input 
+							type='file' 
+							name='archivo' 
+							label="Archivo Excel"
+							accept=".xlsx,.xls,.csv"
+							required
+						/>
+					</div>
+					<div class="flex items-center justify-end gap-3">
+						<flux:button type='submit' variant='primary' icon='arrow-up-tray'>
+							Importar Películas
+						</flux:button>
+					</div>
+				</form>
+    
+
     <div class="mt-2">
         <table class="w-full border border-black">
             <thead>

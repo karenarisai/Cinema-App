@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class pelicula extends Model
 {
     use softDeletes;
+    protected $fillable = [
+        'nombre',
+        'director',
+        'duracion',
+        'genero',
+    ];
 }
